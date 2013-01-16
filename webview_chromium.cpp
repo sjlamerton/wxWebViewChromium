@@ -589,6 +589,11 @@ void wxWebViewChromium::RegisterHandler(wxSharedPtr<wxWebViewHandler> handler)
                                     new CustomSchemeHandlerFactory(handler));
 }
 
+void wxWebViewChromium::Shutdown()
+{
+    CefShutdown();
+}
+
 void ClientHandler::OnTitleChange(CefRefPtr<CefBrowser> browser, const CefString& title)
 {
     m_webview->m_title = title.ToString();

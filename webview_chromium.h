@@ -49,7 +49,7 @@ public:
        Create(parent, id, url, pos, size, style, name);
    }
 
-    ~wxWebViewChromium() {};
+    ~wxWebViewChromium() {}
 
     void OnIdle(wxIdleEvent &event);
     void OnSize(wxSizeEvent &event);
@@ -126,6 +126,8 @@ public:
 
     //Virtual Filesystem Support
     virtual void RegisterHandler(wxSharedPtr<wxWebViewHandler> handler);
+
+    static void Shutdown();
 
 protected:
     virtual void DoSetPage(const wxString& html, const wxString& baseUrl);

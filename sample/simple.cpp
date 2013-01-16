@@ -20,6 +20,12 @@ bool SimpleApp::OnInit()
     return true;
 }
 
+int SimpleApp::OnExit()
+{
+    wxWebViewChromium::Shutdown();
+    return wxApp::OnExit();
+}
+
 SimpleFrame::SimpleFrame() : wxFrame(NULL, wxID_ANY, "wxWebViewChromium")
 {
     wxWebView::RegisterFactory(wxWebViewBackendChromium, wxSharedPtr<wxWebViewFactory>
