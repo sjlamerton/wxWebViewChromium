@@ -18,6 +18,13 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 endif()
 
+# On Linux we require GTK
+if(UNIX)
+    # Find GTK
+    find_package(GTK2 REQUIRED)
+    include_directories(${GTK2_INCLUDE_DIRS})
+endif()
+
 # Find wxWidgets
 find_package(wxWidgets COMPONENTS webview core base REQUIRED)
 include(${wxWidgets_USE_FILE})

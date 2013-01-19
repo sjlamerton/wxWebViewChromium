@@ -271,6 +271,7 @@ bool wxWebViewChromium::Create(wxWindow* parent,
 
     wxSize wxsize = GetSize();
     wxPoint wxpos = GetPosition();
+#ifdef __WXMSW__
     RECT rect;
     rect.top = wxpos.x;
     rect.bottom = wxsize.GetHeight();
@@ -279,7 +280,7 @@ bool wxWebViewChromium::Create(wxWindow* parent,
 
     // Initialize window info to the defaults for a child window
     info.SetAsChild(GetHWND(), rect);
-
+#endif
     // Creat the new child browser window
     m_browser = CefBrowser::CreateBrowserSync(info, new ClientHandler(this), url.ToStdString(), browsersettings);
     return true;
@@ -295,13 +296,14 @@ void wxWebViewChromium::OnSize(wxSizeEvent &WXUNUSED(event))
 {
     wxSize size = GetSize();
     wxPoint pos = GetPosition();
+
+#ifdef __WXMSW__
     RECT rect;
     rect.top = pos.x;
     rect.bottom = size.GetHeight();
     rect.left = pos.y;
     rect.right = size.GetWidth();
 
-#ifdef __WXMSW__
     HDWP hdwp = BeginDeferWindowPos(1);
     hdwp = DeferWindowPos(hdwp, m_browser->GetWindowHandle(), NULL, rect.left, 
                           rect.top, rect.right - rect.left, 
