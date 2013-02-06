@@ -74,7 +74,7 @@ public:
     virtual void ClearHistory();
     virtual void EnableHistory(bool enable = true);
     virtual void Stop();
-    virtual void Reload(wxWebViewReloadFlags flags = wxWEB_VIEW_RELOAD_DEFAULT);
+    virtual void Reload(wxWebViewReloadFlags flags = wxWEBVIEW_RELOAD_DEFAULT);
 
     virtual wxString GetPageSource() const;
     virtual wxString GetPageText() const;
@@ -94,7 +94,7 @@ public:
 
     virtual void* GetNativeBackend() const { return m_browser; }
 
-    virtual long Find(const wxString& text, int flags = wxWEB_VIEW_FIND_DEFAULT) { return wxNOT_FOUND; }
+    virtual long Find(const wxString& text, int flags = wxWEBVIEW_FIND_DEFAULT) { return wxNOT_FOUND; }
 
     //Clipboard functions
     virtual bool CanCut() const { return true; }

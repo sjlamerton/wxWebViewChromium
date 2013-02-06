@@ -401,7 +401,7 @@ void wxWebViewChromium::Stop()
 
 void wxWebViewChromium::Reload(wxWebViewReloadFlags flags)
 {
-    if(flags == wxWEB_VIEW_RELOAD_NO_CACHE)
+    if(flags == wxWEBVIEW_RELOAD_NO_CACHE)
     {
         m_browser->ReloadIgnoreCache();
     }
@@ -505,28 +505,28 @@ wxWebViewZoom wxWebViewChromium::GetZoom() const
     // arbitrary way to map float zoom to our common zoom enum
     if (zoom <= -0.75f)
     {
-        return wxWEB_VIEW_ZOOM_TINY;
+        return wxWEBVIEW_ZOOM_TINY;
     }
     else if (zoom > -0.75 && zoom <= -0.25)
     {
-        return wxWEB_VIEW_ZOOM_SMALL;
+        return wxWEBVIEW_ZOOM_SMALL;
     }
     else if (zoom > -0.25 && zoom <= 0.25)
     {
-        return wxWEB_VIEW_ZOOM_MEDIUM;
+        return wxWEBVIEW_ZOOM_MEDIUM;
     }
     else if (zoom > 0.25 && zoom <= 0.75)
     {
-        return wxWEB_VIEW_ZOOM_LARGE;
+        return wxWEBVIEW_ZOOM_LARGE;
     }
     else if (zoom > 0.75)
     {
-        return wxWEB_VIEW_ZOOM_LARGEST;
+        return wxWEBVIEW_ZOOM_LARGEST;
     }
 
     // to shut up compilers, this can never be reached logically
     wxASSERT(false);
-    return wxWEB_VIEW_ZOOM_MEDIUM;
+    return wxWEBVIEW_ZOOM_MEDIUM;
 }
 
 
@@ -535,23 +535,23 @@ void wxWebViewChromium::SetZoom(wxWebViewZoom zoom)
     // arbitrary way to map our common zoom enum to float zoom
     switch (zoom)
     {
-        case wxWEB_VIEW_ZOOM_TINY:
+        case wxWEBVIEW_ZOOM_TINY:
             m_browser->SetZoomLevel(-1.0f);
             break;
 
-        case wxWEB_VIEW_ZOOM_SMALL:
+        case wxWEBVIEW_ZOOM_SMALL:
             m_browser->SetZoomLevel(-0.5f);
             break;
 
-        case wxWEB_VIEW_ZOOM_MEDIUM:
+        case wxWEBVIEW_ZOOM_MEDIUM:
             m_browser->SetZoomLevel(0.0f);
             break;
 
-        case wxWEB_VIEW_ZOOM_LARGE:
+        case wxWEBVIEW_ZOOM_LARGE:
             m_browser->SetZoomLevel(0.5f);
             break;
 
-        case wxWEB_VIEW_ZOOM_LARGEST:
+        case wxWEBVIEW_ZOOM_LARGEST:
             m_browser->SetZoomLevel(1.0f);
             break;
 
@@ -564,19 +564,19 @@ void wxWebViewChromium::SetZoomType(wxWebViewZoomType type)
 {
     // there is only one supported zoom type at the moment so this setter
     // does nothing beyond checking sanity
-    wxASSERT(type == wxWEB_VIEW_ZOOM_TYPE_LAYOUT);
+    wxASSERT(type == wxWEBVIEW_ZOOM_TYPE_LAYOUT);
 }
 
 wxWebViewZoomType wxWebViewChromium::GetZoomType() const
 {
-    return wxWEB_VIEW_ZOOM_TYPE_LAYOUT;
+    return wxWEBVIEW_ZOOM_TYPE_LAYOUT;
 }
 
 bool wxWebViewChromium::CanSetZoomType(wxWebViewZoomType type) const
 {
     switch (type)
     {
-        case wxWEB_VIEW_ZOOM_TYPE_LAYOUT:
+        case wxWEBVIEW_ZOOM_TYPE_LAYOUT:
             return true;
 
         default:
@@ -601,7 +601,7 @@ void ClientHandler::OnTitleChange(CefRefPtr<CefBrowser> browser, const CefString
     m_webview->m_title = title.ToString();
     wxString target = browser->GetMainFrame()->GetName().ToString();
 
-    wxWebViewEvent event(wxEVT_COMMAND_WEB_VIEW_TITLE_CHANGED, m_webview->GetId(), "", target);
+    wxWebViewEvent event(wxEVT_COMMAND_WEBVIEW_TITLE_CHANGED, m_webview->GetId(), "", target);
     event.SetString(title.ToString());
     event.SetEventObject(m_webview);
 
@@ -627,7 +627,7 @@ bool ClientHandler::OnBeforeBrowse(CefRefPtr<CefBrowser> browser,
 
     m_busyCount++;
 
-    wxWebViewEvent event(wxEVT_COMMAND_WEB_VIEW_NAVIGATING, m_webview->GetId(), url, target);
+    wxWebViewEvent event(wxEVT_COMMAND_WEBVIEW_NAVIGATING, m_webview->GetId(), url, target);
     event.SetEventObject(m_webview);
 
     m_webview->HandleWindowEvent(event);
@@ -652,7 +652,7 @@ void ClientHandler::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
     wxString url = frame->GetURL().ToString();
     wxString target = frame->GetName().ToString();
 
-    wxWebViewEvent event(wxEVT_COMMAND_WEB_VIEW_NAVIGATED, m_webview->GetId(), url, target);
+    wxWebViewEvent event(wxEVT_COMMAND_WEBVIEW_NAVIGATED, m_webview->GetId(), url, target);
     event.SetEventObject(m_webview);
 
     m_webview->HandleWindowEvent(event);
@@ -677,7 +677,7 @@ void ClientHandler::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
         //Reset as we are done now
         m_webview->m_historyLoadingFromList = false;
 
-        wxWebViewEvent levent(wxEVT_COMMAND_WEB_VIEW_LOADED, m_webview->GetId(), url, target);
+        wxWebViewEvent levent(wxEVT_COMMAND_WEBVIEW_LOADED, m_webview->GetId(), url, target);
         levent.SetEventObject(m_webview);
 
         m_webview->HandleWindowEvent(levent);
@@ -692,62 +692,62 @@ bool ClientHandler::OnLoadError(CefRefPtr<CefBrowser> WXUNUSED(browser), CefRefP
                                            type = wxtype;\
                                            break
 
-    wxWebViewNavigationError type = wxWEB_NAV_ERR_OTHER;
+    wxWebViewNavigationError type = wxWEBVIEW_NAV_ERR_OTHER;
     switch (errorCode)
     {
-        ERROR_TYPE_CASE(ERR_FAILED, wxWEB_NAV_ERR_OTHER);
-        ERROR_TYPE_CASE(ERR_ABORTED, wxWEB_NAV_ERR_USER_CANCELLED);
-        ERROR_TYPE_CASE(ERR_INVALID_ARGUMENT, wxWEB_NAV_ERR_OTHER);
-        ERROR_TYPE_CASE(ERR_INVALID_HANDLE, wxWEB_NAV_ERR_OTHER);
-        ERROR_TYPE_CASE(ERR_FILE_NOT_FOUND, wxWEB_NAV_ERR_NOT_FOUND);
-        ERROR_TYPE_CASE(ERR_TIMED_OUT, wxWEB_NAV_ERR_CONNECTION);
-        ERROR_TYPE_CASE(ERR_FILE_TOO_BIG, wxWEB_NAV_ERR_OTHER);
-        ERROR_TYPE_CASE(ERR_UNEXPECTED, wxWEB_NAV_ERR_OTHER);
-        ERROR_TYPE_CASE(ERR_ACCESS_DENIED, wxWEB_NAV_ERR_AUTH);
-        ERROR_TYPE_CASE(ERR_NOT_IMPLEMENTED, wxWEB_NAV_ERR_OTHER);
-        ERROR_TYPE_CASE(ERR_CONNECTION_CLOSED, wxWEB_NAV_ERR_CONNECTION);
-        ERROR_TYPE_CASE(ERR_CONNECTION_RESET, wxWEB_NAV_ERR_CONNECTION);
-        ERROR_TYPE_CASE(ERR_CONNECTION_REFUSED, wxWEB_NAV_ERR_CONNECTION);
-        ERROR_TYPE_CASE(ERR_CONNECTION_ABORTED, wxWEB_NAV_ERR_CONNECTION);
-        ERROR_TYPE_CASE(ERR_CONNECTION_FAILED, wxWEB_NAV_ERR_CONNECTION);
-        ERROR_TYPE_CASE(ERR_NAME_NOT_RESOLVED, wxWEB_NAV_ERR_CONNECTION);
-        ERROR_TYPE_CASE(ERR_INTERNET_DISCONNECTED, wxWEB_NAV_ERR_CONNECTION);
-        ERROR_TYPE_CASE(ERR_SSL_PROTOCOL_ERROR, wxWEB_NAV_ERR_SECURITY);
-        ERROR_TYPE_CASE(ERR_ADDRESS_INVALID, wxWEB_NAV_ERR_REQUEST);
-        ERROR_TYPE_CASE(ERR_ADDRESS_UNREACHABLE, wxWEB_NAV_ERR_CONNECTION);
-        ERROR_TYPE_CASE(ERR_SSL_CLIENT_AUTH_CERT_NEEDED, wxWEB_NAV_ERR_AUTH);
-        ERROR_TYPE_CASE(ERR_TUNNEL_CONNECTION_FAILED, wxWEB_NAV_ERR_CONNECTION);
-        ERROR_TYPE_CASE(ERR_NO_SSL_VERSIONS_ENABLED, wxWEB_NAV_ERR_SECURITY);
-        ERROR_TYPE_CASE(ERR_SSL_VERSION_OR_CIPHER_MISMATCH, wxWEB_NAV_ERR_SECURITY);
-        ERROR_TYPE_CASE(ERR_SSL_RENEGOTIATION_REQUESTED, wxWEB_NAV_ERR_REQUEST);
-        ERROR_TYPE_CASE(ERR_CERT_COMMON_NAME_INVALID, wxWEB_NAV_ERR_CERTIFICATE);
-        ERROR_TYPE_CASE(ERR_CERT_DATE_INVALID, wxWEB_NAV_ERR_CERTIFICATE);
-        ERROR_TYPE_CASE(ERR_CERT_AUTHORITY_INVALID, wxWEB_NAV_ERR_CERTIFICATE);
-        ERROR_TYPE_CASE(ERR_CERT_CONTAINS_ERRORS, wxWEB_NAV_ERR_CERTIFICATE);
-        ERROR_TYPE_CASE(ERR_CERT_NO_REVOCATION_MECHANISM, wxWEB_NAV_ERR_CERTIFICATE);
-        ERROR_TYPE_CASE(ERR_CERT_UNABLE_TO_CHECK_REVOCATION, wxWEB_NAV_ERR_CERTIFICATE);
-        ERROR_TYPE_CASE(ERR_CERT_REVOKED, wxWEB_NAV_ERR_CERTIFICATE);
-        ERROR_TYPE_CASE(ERR_CERT_INVALID, wxWEB_NAV_ERR_CERTIFICATE);
-        ERROR_TYPE_CASE(ERR_CERT_END, wxWEB_NAV_ERR_CERTIFICATE);
-        ERROR_TYPE_CASE(ERR_INVALID_URL, wxWEB_NAV_ERR_REQUEST);
-        ERROR_TYPE_CASE(ERR_DISALLOWED_URL_SCHEME, wxWEB_NAV_ERR_REQUEST);
-        ERROR_TYPE_CASE(ERR_UNKNOWN_URL_SCHEME, wxWEB_NAV_ERR_REQUEST);
-        ERROR_TYPE_CASE(ERR_TOO_MANY_REDIRECTS, wxWEB_NAV_ERR_OTHER);
-        ERROR_TYPE_CASE(ERR_UNSAFE_REDIRECT, wxWEB_NAV_ERR_SECURITY);
-        ERROR_TYPE_CASE(ERR_UNSAFE_PORT, wxWEB_NAV_ERR_SECURITY);
-        ERROR_TYPE_CASE(ERR_INVALID_RESPONSE, wxWEB_NAV_ERR_OTHER);
-        ERROR_TYPE_CASE(ERR_INVALID_CHUNKED_ENCODING, wxWEB_NAV_ERR_OTHER);
-        ERROR_TYPE_CASE(ERR_METHOD_NOT_SUPPORTED, wxWEB_NAV_ERR_OTHER);
-        ERROR_TYPE_CASE(ERR_UNEXPECTED_PROXY_AUTH, wxWEB_NAV_ERR_OTHER);
-        ERROR_TYPE_CASE(ERR_EMPTY_RESPONSE, wxWEB_NAV_ERR_OTHER);
-        ERROR_TYPE_CASE(ERR_RESPONSE_HEADERS_TOO_BIG, wxWEB_NAV_ERR_OTHER);
-        ERROR_TYPE_CASE(ERR_CACHE_MISS, wxWEB_NAV_ERR_OTHER);
-        ERROR_TYPE_CASE(ERR_INSECURE_RESPONSE, wxWEB_NAV_ERR_SECURITY);
+        ERROR_TYPE_CASE(ERR_FAILED, wxWEBVIEW_NAV_ERR_OTHER);
+        ERROR_TYPE_CASE(ERR_ABORTED, wxWEBVIEW_NAV_ERR_USER_CANCELLED);
+        ERROR_TYPE_CASE(ERR_INVALID_ARGUMENT, wxWEBVIEW_NAV_ERR_OTHER);
+        ERROR_TYPE_CASE(ERR_INVALID_HANDLE, wxWEBVIEW_NAV_ERR_OTHER);
+        ERROR_TYPE_CASE(ERR_FILE_NOT_FOUND, wxWEBVIEW_NAV_ERR_NOT_FOUND);
+        ERROR_TYPE_CASE(ERR_TIMED_OUT, wxWEBVIEW_NAV_ERR_CONNECTION);
+        ERROR_TYPE_CASE(ERR_FILE_TOO_BIG, wxWEBVIEW_NAV_ERR_OTHER);
+        ERROR_TYPE_CASE(ERR_UNEXPECTED, wxWEBVIEW_NAV_ERR_OTHER);
+        ERROR_TYPE_CASE(ERR_ACCESS_DENIED, wxWEBVIEW_NAV_ERR_AUTH);
+        ERROR_TYPE_CASE(ERR_NOT_IMPLEMENTED, wxWEBVIEW_NAV_ERR_OTHER);
+        ERROR_TYPE_CASE(ERR_CONNECTION_CLOSED, wxWEBVIEW_NAV_ERR_CONNECTION);
+        ERROR_TYPE_CASE(ERR_CONNECTION_RESET, wxWEBVIEW_NAV_ERR_CONNECTION);
+        ERROR_TYPE_CASE(ERR_CONNECTION_REFUSED, wxWEBVIEW_NAV_ERR_CONNECTION);
+        ERROR_TYPE_CASE(ERR_CONNECTION_ABORTED, wxWEBVIEW_NAV_ERR_CONNECTION);
+        ERROR_TYPE_CASE(ERR_CONNECTION_FAILED, wxWEBVIEW_NAV_ERR_CONNECTION);
+        ERROR_TYPE_CASE(ERR_NAME_NOT_RESOLVED, wxWEBVIEW_NAV_ERR_CONNECTION);
+        ERROR_TYPE_CASE(ERR_INTERNET_DISCONNECTED, wxWEBVIEW_NAV_ERR_CONNECTION);
+        ERROR_TYPE_CASE(ERR_SSL_PROTOCOL_ERROR, wxWEBVIEW_NAV_ERR_SECURITY);
+        ERROR_TYPE_CASE(ERR_ADDRESS_INVALID, wxWEBVIEW_NAV_ERR_REQUEST);
+        ERROR_TYPE_CASE(ERR_ADDRESS_UNREACHABLE, wxWEBVIEW_NAV_ERR_CONNECTION);
+        ERROR_TYPE_CASE(ERR_SSL_CLIENT_AUTH_CERT_NEEDED, wxWEBVIEW_NAV_ERR_AUTH);
+        ERROR_TYPE_CASE(ERR_TUNNEL_CONNECTION_FAILED, wxWEBVIEW_NAV_ERR_CONNECTION);
+        ERROR_TYPE_CASE(ERR_NO_SSL_VERSIONS_ENABLED, wxWEBVIEW_NAV_ERR_SECURITY);
+        ERROR_TYPE_CASE(ERR_SSL_VERSION_OR_CIPHER_MISMATCH, wxWEBVIEW_NAV_ERR_SECURITY);
+        ERROR_TYPE_CASE(ERR_SSL_RENEGOTIATION_REQUESTED, wxWEBVIEW_NAV_ERR_REQUEST);
+        ERROR_TYPE_CASE(ERR_CERT_COMMON_NAME_INVALID, wxWEBVIEW_NAV_ERR_CERTIFICATE);
+        ERROR_TYPE_CASE(ERR_CERT_DATE_INVALID, wxWEBVIEW_NAV_ERR_CERTIFICATE);
+        ERROR_TYPE_CASE(ERR_CERT_AUTHORITY_INVALID, wxWEBVIEW_NAV_ERR_CERTIFICATE);
+        ERROR_TYPE_CASE(ERR_CERT_CONTAINS_ERRORS, wxWEBVIEW_NAV_ERR_CERTIFICATE);
+        ERROR_TYPE_CASE(ERR_CERT_NO_REVOCATION_MECHANISM, wxWEBVIEW_NAV_ERR_CERTIFICATE);
+        ERROR_TYPE_CASE(ERR_CERT_UNABLE_TO_CHECK_REVOCATION, wxWEBVIEW_NAV_ERR_CERTIFICATE);
+        ERROR_TYPE_CASE(ERR_CERT_REVOKED, wxWEBVIEW_NAV_ERR_CERTIFICATE);
+        ERROR_TYPE_CASE(ERR_CERT_INVALID, wxWEBVIEW_NAV_ERR_CERTIFICATE);
+        ERROR_TYPE_CASE(ERR_CERT_END, wxWEBVIEW_NAV_ERR_CERTIFICATE);
+        ERROR_TYPE_CASE(ERR_INVALID_URL, wxWEBVIEW_NAV_ERR_REQUEST);
+        ERROR_TYPE_CASE(ERR_DISALLOWED_URL_SCHEME, wxWEBVIEW_NAV_ERR_REQUEST);
+        ERROR_TYPE_CASE(ERR_UNKNOWN_URL_SCHEME, wxWEBVIEW_NAV_ERR_REQUEST);
+        ERROR_TYPE_CASE(ERR_TOO_MANY_REDIRECTS, wxWEBVIEW_NAV_ERR_OTHER);
+        ERROR_TYPE_CASE(ERR_UNSAFE_REDIRECT, wxWEBVIEW_NAV_ERR_SECURITY);
+        ERROR_TYPE_CASE(ERR_UNSAFE_PORT, wxWEBVIEW_NAV_ERR_SECURITY);
+        ERROR_TYPE_CASE(ERR_INVALID_RESPONSE, wxWEBVIEW_NAV_ERR_OTHER);
+        ERROR_TYPE_CASE(ERR_INVALID_CHUNKED_ENCODING, wxWEBVIEW_NAV_ERR_OTHER);
+        ERROR_TYPE_CASE(ERR_METHOD_NOT_SUPPORTED, wxWEBVIEW_NAV_ERR_OTHER);
+        ERROR_TYPE_CASE(ERR_UNEXPECTED_PROXY_AUTH, wxWEBVIEW_NAV_ERR_OTHER);
+        ERROR_TYPE_CASE(ERR_EMPTY_RESPONSE, wxWEBVIEW_NAV_ERR_OTHER);
+        ERROR_TYPE_CASE(ERR_RESPONSE_HEADERS_TOO_BIG, wxWEBVIEW_NAV_ERR_OTHER);
+        ERROR_TYPE_CASE(ERR_CACHE_MISS, wxWEBVIEW_NAV_ERR_OTHER);
+        ERROR_TYPE_CASE(ERR_INSECURE_RESPONSE, wxWEBVIEW_NAV_ERR_SECURITY);
     }
 
     wxString url = failedUrl.ToString();
     wxString target = frame->GetName().ToString();
-    wxWebViewEvent event(wxEVT_COMMAND_WEB_VIEW_ERROR, m_webview->GetId(), url, target);
+    wxWebViewEvent event(wxEVT_COMMAND_WEBVIEW_ERROR, m_webview->GetId(), url, target);
     event.SetEventObject(m_webview);
     event.SetInt(type);
     event.SetString(errorText.ToString());
@@ -764,7 +764,7 @@ bool ClientHandler::OnBeforePopup(CefRefPtr<CefBrowser> WXUNUSED(parentBrowser),
                                   CefRefPtr<CefClient>& WXUNUSED(client),
                                   CefBrowserSettings& WXUNUSED(settings))
 {
-    wxWebViewEvent event(wxEVT_COMMAND_WEB_VIEW_NEWWINDOW, m_webview->GetId(), url.ToString(), "");
+    wxWebViewEvent event(wxEVT_COMMAND_WEBVIEW_NEWWINDOW, m_webview->GetId(), url.ToString(), "");
     event.SetEventObject(m_webview);
     m_webview->HandleWindowEvent(event);
 
