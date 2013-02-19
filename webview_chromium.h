@@ -29,6 +29,7 @@
 #include <wx/sharedptr.h>
 #include <wx/vector.h>
 #include <wx/webview.h>
+#include <wx/timer.h>
 
 extern const char wxWebViewBackendChromium[];
 
@@ -49,9 +50,13 @@ public:
        Create(parent, id, url, pos, size, style, name);
    }
 
-    ~wxWebViewChromium() {}
+    ~wxWebViewChromium() {
+        m_timer->Stop();
+        wxDELETE(m_timer);
+        m_browser->ParentWindowWillClose();
+    }
 
-    void OnIdle(wxIdleEvent &event);
+    void OnTimer(wxTimerEvent &event);
     void OnSize(wxSizeEvent &event);
 
     bool Create(wxWindow* parent,
@@ -146,6 +151,9 @@ private:
 
     //We also friend ClientHandler so it can access the history
     friend class ClientHandler;
+
+    //Our timer handles the CEF event loop
+    wxTimer *m_timer;
   
     wxDECLARE_DYNAMIC_CLASS(wxWebViewChromium);
     wxDECLARE_EVENT_TABLE();

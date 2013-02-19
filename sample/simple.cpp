@@ -28,8 +28,18 @@ int SimpleApp::OnExit()
 
 SimpleFrame::SimpleFrame() : wxFrame(NULL, wxID_ANY, "wxWebViewChromium")
 {
+    timer = new wxTimer(this);
+    this->Bind(wxEVT_TIMER, &SimpleFrame::OnTimer, this);
+
     wxWebView::RegisterFactory(wxWebViewBackendChromium, wxSharedPtr<wxWebViewFactory>
                                                                      (new wxWebViewFactoryChromium));
-    wxWebView* webview = wxWebView::New(this, wxID_ANY, "http://www.whatismybrowser.com/",
-                                        wxDefaultPosition, wxDefaultSize, wxWebViewBackendChromium);
+    webview = wxWebView::New(this, wxID_ANY, "http://www.blick.ch/",
+                             wxDefaultPosition, wxDefaultSize, wxWebViewBackendChromium);
+
+    //timer->Start(2000);
+}
+
+void SimpleFrame::OnTimer(wxTimerEvent &event)
+{
+    //wxDELETE(webview);
 }

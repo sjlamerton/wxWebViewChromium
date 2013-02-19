@@ -3,6 +3,7 @@
 
 #include <wx/app.h>
 #include <wx/frame.h>
+#include <wx/timer.h>
 
 class SimpleApp : public wxApp
 {
@@ -15,6 +16,11 @@ class SimpleFrame : public wxFrame
 {
 public:
     SimpleFrame();
+
+    void OnTimer(wxTimerEvent &event);
+private:
+    wxTimer *timer;
+    wxWebView *webview;
 };
 
 IMPLEMENT_APP(SimpleApp)
