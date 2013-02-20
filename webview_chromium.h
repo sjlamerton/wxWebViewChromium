@@ -29,6 +29,7 @@
 #include <wx/sharedptr.h>
 #include <wx/vector.h>
 #include <wx/webview.h>
+#include <wx/timer.h>
 
 extern const char wxWebViewBackendChromium[];
 
@@ -49,9 +50,9 @@ public:
        Create(parent, id, url, pos, size, style, name);
    }
 
-    ~wxWebViewChromium() {}
+    ~wxWebViewChromium();
 
-    void OnIdle(wxIdleEvent &event);
+    void OnTimer(wxTimerEvent &event);
     void OnSize(wxSizeEvent &event);
 
     bool Create(wxWindow* parent,
@@ -143,6 +144,9 @@ private:
 
     //We need to store the title ourselves
     wxString m_title;
+
+    //The timer calls the CEF event loop
+    wxTimer *m_timer;
 
     //We also friend ClientHandler so it can access the history
     friend class ClientHandler;

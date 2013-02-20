@@ -241,7 +241,7 @@ private:
 wxIMPLEMENT_DYNAMIC_CLASS(wxWebViewChromium, wxWebView);
 
 wxBEGIN_EVENT_TABLE(wxWebViewChromium, wxWebView)
-    EVT_IDLE(wxWebViewChromium::OnIdle)
+    EVT_TIMER(wxID_ANY, wxWebViewChromium::OnTimer)
     EVT_SIZE(wxWebViewChromium::OnSize)
 wxEND_EVENT_TABLE()
 
@@ -283,13 +283,25 @@ bool wxWebViewChromium::Create(wxWindow* parent,
 #endif
     // Creat the new child browser window
     m_browser = CefBrowser::CreateBrowserSync(info, new ClientHandler(this), url.ToStdString(), browsersettings);
+    
+    this->Bind(wxEVT_TIMER, &wxWebViewChromium::OnTimer, this);
+
+    m_timer = new wxTimer(this);
+    m_timer->Start(100);
+    
     return true;
 }
 
-void wxWebViewChromium::OnIdle(wxIdleEvent &event)
+wxWebViewChromium::~wxWebViewChromium()
+{
+    m_timer->Stop();
+    wxDELETE(m_timer);
+    m_browser->ParentWindowWillClose();
+}
+
+void wxWebViewChromium::OnTimer(wxTimerEvent &event)
 {
     CefDoMessageLoopWork();
-    event.Skip();
 }
 
 void wxWebViewChromium::OnSize(wxSizeEvent &WXUNUSED(event))
@@ -598,6 +610,10 @@ void wxWebViewChromium::Shutdown()
 
 void ClientHandler::OnTitleChange(CefRefPtr<CefBrowser> browser, const CefString& title)
 {
+    //Check we still exist
+    if(!m_webview || m_webview->IsBeingDeleted())
+        return;
+
     m_webview->m_title = title.ToString();
     wxString target = browser->GetMainFrame()->GetName().ToString();
 
@@ -614,6 +630,10 @@ bool ClientHandler::OnBeforeBrowse(CefRefPtr<CefBrowser> browser,
                                    CefRequestHandler::NavType WXUNUSED(navType), 
                                    bool WXUNUSED(isRedirect))
 {
+    //Check we still exist
+    if(!m_webview || m_webview->IsBeingDeleted())
+        return true;
+    
     //If the new window event has been veted we shouldn't load the page
     //This is cancelled here because it cannot be cancelled from OnBeforePopup
     if(m_cancelLoad)
@@ -647,6 +667,10 @@ void ClientHandler::OnLoadStart(CefRefPtr<CefBrowser> WXUNUSED(browser), CefRefP
 
 void ClientHandler::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int WXUNUSED(httpStatusCode))
 {
+    //Check we still exist
+    if(!m_webview || m_webview->IsBeingDeleted())
+        return;
+
     m_busyCount--;
 
     wxString url = frame->GetURL().ToString();
@@ -687,6 +711,10 @@ void ClientHandler::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
 bool ClientHandler::OnLoadError(CefRefPtr<CefBrowser> WXUNUSED(browser), CefRefPtr<CefFrame> frame, ErrorCode errorCode,
                                 const CefString& failedUrl, CefString& errorText)
 { 
+    //Check we still exist
+    if(!m_webview || m_webview->IsBeingDeleted())
+        return false;
+
     //We define a macro for convenience
 #define ERROR_TYPE_CASE(error, wxtype) case(error): \
                                            type = wxtype;\
@@ -764,6 +792,10 @@ bool ClientHandler::OnBeforePopup(CefRefPtr<CefBrowser> WXUNUSED(parentBrowser),
                                   CefRefPtr<CefClient>& WXUNUSED(client),
                                   CefBrowserSettings& WXUNUSED(settings))
 {
+    //Check we still exist
+    if(!m_webview || m_webview->IsBeingDeleted())
+        return true;
+
     wxWebViewEvent event(wxEVT_COMMAND_WEBVIEW_NEWWINDOW, m_webview->GetId(), url.ToString(), "");
     event.SetEventObject(m_webview);
     m_webview->HandleWindowEvent(event);
