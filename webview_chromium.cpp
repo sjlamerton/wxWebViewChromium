@@ -598,9 +598,12 @@ bool wxWebViewChromium::CanSetZoomType(wxWebViewZoomType type) const
 
 void wxWebViewChromium::RegisterHandler(wxSharedPtr<wxWebViewHandler> handler)
 {
+    // We currently don't support custom scheme handlers with 1.1364.1123 or greater
+#if CEF_REVISION < 1123
     CefRegisterCustomScheme(handler->GetName().ToStdString(), true, false, false);
     CefRegisterSchemeHandlerFactory(handler->GetName().ToStdString(), "", 
                                     new CustomSchemeHandlerFactory(handler));
+#endif
 }
 
 void wxWebViewChromium::Shutdown()
