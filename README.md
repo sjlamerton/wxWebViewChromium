@@ -9,7 +9,8 @@ Requirements
 ------------
 
 * [wxWidgets][2]: r73369 / 2.9.5  or greater
-* [Chromium Embedded Framework][3]:  1.963.439, 1.1025.607 or 1.1180.832
+* [Chromium Embedded Framework][3]:  1.963.439, 1.1025.607, 1.1180.832 or 
+   1.1364.1123.
 
 Compiling
 ---------
