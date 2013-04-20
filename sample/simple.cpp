@@ -14,6 +14,9 @@
 
 bool SimpleApp::OnInit()
 {
+    if(!wxWebViewChromium::StartUp())
+        return false;
+
     SimpleFrame *frame = new SimpleFrame();
     frame->Show(true);
 
@@ -30,6 +33,6 @@ SimpleFrame::SimpleFrame() : wxFrame(NULL, wxID_ANY, "wxWebViewChromium")
 {
     wxWebView::RegisterFactory(wxWebViewBackendChromium, wxSharedPtr<wxWebViewFactory>
                                                                      (new wxWebViewFactoryChromium));
-    wxWebView* webview = wxWebView::New(this, wxID_ANY, "http://www.whatismybrowser.com/",
+    wxWebView* webview = wxWebView::New(this, wxID_ANY, "http://www.bbc.co.uk/",
                                         wxDefaultPosition, wxDefaultSize, wxWebViewBackendChromium);
 }
