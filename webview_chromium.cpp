@@ -48,22 +48,13 @@ bool wxWebViewChromium::Create(wxWindow* parent,
     CefBrowserSettings browsersettings;
     CefWindowInfo info;
 
-    wxSize wxsize = GetSize();
-    wxPoint wxpos = GetPosition();
 #ifdef __WXMSW__
-    RECT rect;
-    //RECT wxGetClientRect(HWND hwnd)
-    rect.top = wxpos.x;
-    rect.bottom = wxsize.GetHeight();
-    rect.left = wxpos.y;
-    rect.right = wxsize.GetWidth();
-
     // Initialize window info to the defaults for a child window
-    info.SetAsChild(GetHWND(), rect);
+    info.SetAsChild(GetHWND(), wxGetClientRect(this->GetHWND()));
 #endif
     // Creat the new child browser window, we do this async as we use a multi
     // threaded message loop
-    CefBrowserHost::CreateBrowser(info, NULL,
+    CefBrowserHost::CreateBrowser(info, static_cast<CefRefPtr<CefClient>>(g_clientHandler),
                                   url.ToStdString(), browsersettings);
 
     this->Bind(wxEVT_SIZE, &wxWebViewChromium::OnSize, this);
@@ -73,29 +64,24 @@ bool wxWebViewChromium::Create(wxWindow* parent,
 
 wxWebViewChromium::~wxWebViewChromium()
 {
-    //CefRefPtr<CefBrowser> browser = m_clientHandler->GetBrowser();
-    //if(browser.get()) {
+    CefRefPtr<CefBrowser> browser = g_clientHandler->GetBrowser();
+    if(browser.get()) {
         // Let the browser window know we are about to destroy it.
-        //browser->GetHost()->ParentWindowWillClose();
-    //}
+        browser->GetHost()->ParentWindowWillClose();
+    }
 }
 
 void wxWebViewChromium::OnSize(wxSizeEvent &WXUNUSED(event))
 {
-    wxSize size = GetSize();
+    wxSize size = GetClientSize();
     wxPoint pos = GetPosition();
 
 #ifdef __WXMSW__
-    RECT rect;
-    rect.top = pos.x;
-    rect.bottom = size.GetHeight();
-    rect.left = pos.y;
-    rect.right = size.GetWidth();
-
+    HWND handle = g_clientHandler->GetBrowser()->GetHost()->GetWindowHandle();
     HDWP hdwp = BeginDeferWindowPos(1);
-  //  hdwp = DeferWindowPos(hdwp, m_clientHandler->GetBrowser()->GetHost()->GetWindowHandle(), NULL, rect.left, 
-   //                       rect.top, rect.right - rect.left, 
-    //                      rect.bottom - rect.top, SWP_NOZORDER);
+    hdwp = DeferWindowPos(hdwp, handle, 
+                          NULL, pos.x, pos.y,
+                          size.GetWidth(), size.GetHeight(), SWP_NOZORDER);
     EndDeferWindowPos(hdwp);
 #endif
 }
@@ -396,7 +382,6 @@ void wxWebViewChromium::Shutdown()
     CefShutdown();
 }
 
-/*
 // CefLifeSpanHandler methods
 bool ClientHandler::OnBeforePopup(CefRefPtr<CefBrowser> browser,
                              CefRefPtr<CefFrame> frame,
@@ -413,11 +398,11 @@ bool ClientHandler::OnBeforePopup(CefRefPtr<CefBrowser> browser,
 
 void ClientHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
 {
-    //AutoLock lock_scope(this);
-   // if(!m_browser.get())
-   // {
-      //  m_browser = browser;
-   // }
+    if(!m_browser.get())
+    {
+        m_browser = browser;
+        m_browserId = browser->GetIdentifier();
+    }
 }
 bool ClientHandler::DoClose(CefRefPtr<CefBrowser> browser)
 {
@@ -425,4 +410,9 @@ bool ClientHandler::DoClose(CefRefPtr<CefBrowser> browser)
 }
 
 void ClientHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser)
-{}*/
+{
+    if(browser->GetIdentifier() == m_browserId)
+    {
+        m_browser = NULL;
+    }
+}

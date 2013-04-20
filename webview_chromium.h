@@ -30,14 +30,14 @@
 extern const char wxWebViewBackendChromium[];
 
 // ClientHandler implementation.
-class ClientHandler : public CefClient/*,
-                      public CefLifeSpanHandler*/
+class ClientHandler : public CefClient,
+                      public CefLifeSpanHandler
 {
 public:
     ClientHandler() {};
-    virtual ~ClientHandler() {/* m_browser->Release();*/ };
+    virtual ~ClientHandler() {};
 
-  /*  virtual CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler()  { return this; }
+    virtual CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler()  { return this; }
 
     // CefLifeSpanHandler methods
     virtual bool OnBeforePopup(CefRefPtr<CefBrowser> browser,
@@ -51,12 +51,13 @@ public:
                                bool* no_javascript_access);
     virtual void OnAfterCreated(CefRefPtr<CefBrowser> browser);
     virtual bool DoClose(CefRefPtr<CefBrowser> browser);
-    virtual void OnBeforeClose(CefRefPtr<CefBrowser> browser);*/
+    virtual void OnBeforeClose(CefRefPtr<CefBrowser> browser);
 
-  //  CefRefPtr<CefBrowser> GetBrowser() { return m_browser; }
+    CefRefPtr<CefBrowser> GetBrowser() { return m_browser; }
 
 private:
-  //  CefRefPtr<CefBrowser> m_browser;
+    CefRefPtr<CefBrowser> m_browser;
+    int m_browserId;
 
     IMPLEMENT_REFCOUNTING(ClientHandler);
 };
