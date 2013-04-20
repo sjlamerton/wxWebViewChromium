@@ -306,7 +306,7 @@ void wxWebViewChromium::OnTimer(wxTimerEvent &event)
 
 void wxWebViewChromium::OnSize(wxSizeEvent &WXUNUSED(event))
 {
-    wxSize size = GetSize();
+    wxSize size = GetClientSize();
     wxPoint pos = GetPosition();
 
 #ifdef __WXMSW__
