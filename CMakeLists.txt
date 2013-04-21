@@ -26,11 +26,10 @@ if(UNIX)
 endif()
 
 # Find wxWidgets
-find_package(wxWidgets COMPONENTS webview core base REQUIRED)
+find_package(wxWidgets COMPONENTS webview adv  xml stc scintilla core base REQUIRED)
 include(${wxWidgets_USE_FILE})
 
 # Addwxwebviewchromium to a simple library so we can use it in all samples
 add_library(wvc STATIC webview_chromium.cpp webview_chromium.h)
 
-
-add_subdirectory(sample)
+add_subdirectory(samples)

@@ -10,7 +10,7 @@
 #include <wx/webview.h>
 
 #include "simple.h"
-#include "../webview_chromium.h"
+#include "../../webview_chromium.h"
 
 bool SimpleApp::OnInit()
 {
