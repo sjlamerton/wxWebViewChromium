@@ -9,6 +9,8 @@
 #include <wx/filesys.h>
 #include <wx/msw/private.h>
 
+
+
 #ifdef __VISUALC__
 #pragma warning(push)
 #pragma warning(disable:4100)
@@ -41,9 +43,9 @@ bool wxWebViewChromium::Create(wxWindow* parent,
         return false;
     }
 
-    //m_historyLoadingFromList = false;
-    //m_historyEnabled = true;
-    //m_historyPosition = -1;
+    m_historyLoadingFromList = false;
+    m_historyEnabled = true;
+    m_historyPosition = -1;
 
     CefBrowserSettings browsersettings;
     CefWindowInfo info;
@@ -154,7 +156,7 @@ void wxWebViewChromium::GoForward()
 
 void wxWebViewChromium::LoadURL(const wxString& url)
 { 
-   // m_browser->GetMainFrame()->LoadURL(url.ToStdString());
+    g_clientHandler->GetBrowser()->GetMainFrame()->LoadURL(url.ToStdString());
 }
 
 void wxWebViewChromium::ClearHistory()
@@ -170,18 +172,18 @@ void wxWebViewChromium::EnableHistory(bool enable)
 
 void wxWebViewChromium::Stop()
 {
- //   m_browser->StopLoad();
+    g_clientHandler->GetBrowser()->StopLoad();
 }
 
 void wxWebViewChromium::Reload(wxWebViewReloadFlags flags)
 {
     if(flags == wxWEBVIEW_RELOAD_NO_CACHE)
     {
-    //    m_browser->ReloadIgnoreCache();
+        g_clientHandler->GetBrowser()->ReloadIgnoreCache();
     }
     else
     {
-    //    m_browser->Reload();
+        g_clientHandler->GetBrowser()->Reload();
     }
 }
 
@@ -260,7 +262,7 @@ void wxWebViewChromium::RunScript(const wxString& javascript)
 
 bool wxWebViewChromium::IsBusy() const
 {
-    return false;
+    return g_clientHandler->IsBusy();
 }
 
 void wxWebViewChromium::SetEditable(bool enable)
@@ -416,3 +418,34 @@ void ClientHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser)
         m_browser = NULL;
     }
 }
+
+// CefLoadHandler methods
+void ClientHandler::OnLoadStart(CefRefPtr<CefBrowser> browser,
+                                CefRefPtr<CefFrame> frame)
+{
+    if(browser->GetIdentifier() == m_browserId && frame->IsMain())
+    {
+        m_isLoading = true;
+    }
+}
+
+void ClientHandler::OnLoadEnd(CefRefPtr<CefBrowser> browser,
+                              CefRefPtr<CefFrame> frame,
+                              int httpStatusCode)
+{
+    if(browser->GetIdentifier() == m_browserId && frame->IsMain())
+    {
+        m_isLoading = false;
+    }
+}
+
+void ClientHandler::OnLoadError(CefRefPtr<CefBrowser> browser,
+                                CefRefPtr<CefFrame> frame,
+                                ErrorCode errorCode,
+                                const CefString& errorText,
+                                const CefString& failedUrl)
+{}
+
+void ClientHandler::OnRenderProcessTerminated(CefRefPtr<CefBrowser> browser,
+                                              TerminationStatus status)
+{}

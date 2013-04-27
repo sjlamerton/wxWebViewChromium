@@ -31,13 +31,15 @@ extern const char wxWebViewBackendChromium[];
 
 // ClientHandler implementation.
 class ClientHandler : public CefClient,
-                      public CefLifeSpanHandler
+                      public CefLifeSpanHandler,
+                      public CefLoadHandler
 {
 public:
-    ClientHandler() {};
+    ClientHandler() : m_isLoading(false) {};
     virtual ~ClientHandler() {};
 
-    virtual CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler()  { return this; }
+    virtual CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() { return this; }
+    virtual CefRefPtr<CefLoadHandler> GetLoadHandler() { return this; }
 
     // CefLifeSpanHandler methods
     virtual bool OnBeforePopup(CefRefPtr<CefBrowser> browser,
@@ -53,11 +55,28 @@ public:
     virtual bool DoClose(CefRefPtr<CefBrowser> browser);
     virtual void OnBeforeClose(CefRefPtr<CefBrowser> browser);
 
+    // CefLoadHandler methods
+    virtual void OnLoadStart(CefRefPtr<CefBrowser> browser,
+                             CefRefPtr<CefFrame> frame);
+    virtual void OnLoadEnd(CefRefPtr<CefBrowser> browser,
+                           CefRefPtr<CefFrame> frame,
+                           int httpStatusCode);
+    virtual void OnLoadError(CefRefPtr<CefBrowser> browser,
+                             CefRefPtr<CefFrame> frame,
+                             ErrorCode errorCode,
+                             const CefString& errorText,
+                             const CefString& failedUrl);
+    virtual void OnRenderProcessTerminated(CefRefPtr<CefBrowser> browser,
+                                           TerminationStatus status);
+
     CefRefPtr<CefBrowser> GetBrowser() { return m_browser; }
+
+    bool IsBusy() { return m_isLoading; }
 
 private:
     CefRefPtr<CefBrowser> m_browser;
     int m_browserId;
+    bool m_isLoading;
 
     IMPLEMENT_REFCOUNTING(ClientHandler);
 };
