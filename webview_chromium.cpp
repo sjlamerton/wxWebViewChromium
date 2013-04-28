@@ -50,6 +50,8 @@ bool wxWebViewChromium::Create(wxWindow* parent,
     CefBrowserSettings browsersettings;
     CefWindowInfo info;
 
+    g_clientHandler->SetWebView(this);
+
 #ifdef __WXMSW__
     // Initialize window info to the defaults for a child window
     info.SetAsChild(GetHWND(), wxGetClientRect(this->GetHWND()));
@@ -388,6 +390,33 @@ void wxWebViewChromium::Shutdown()
     CefShutdown();
 }
 
+// CefDisplayHandler methods
+void ClientHandler::OnLoadingStateChange(CefRefPtr<CefBrowser> browser, bool isLoading,
+                          bool canGoBack, bool canGoForward)
+{}
+
+void ClientHandler::OnAddressChange(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame,
+                     const CefString& url)
+{}
+
+void ClientHandler::OnTitleChange(CefRefPtr<CefBrowser> browser, const CefString& title)
+{
+    m_webview->m_title = title.ToString();
+    wxString target = browser->GetMainFrame()->GetName().ToString();
+
+    wxWebViewEvent event(wxEVT_COMMAND_WEBVIEW_TITLE_CHANGED, m_webview->GetId(), "", target);
+    event.SetString(title.ToString());
+    event.SetEventObject(m_webview);
+
+    m_webview->HandleWindowEvent(event);
+}
+
+bool ClientHandler::OnConsoleMessage(CefRefPtr<CefBrowser> browser, const CefString& message,
+                      const CefString& source, int line)
+{
+    return false;
+}
+
 // CefLifeSpanHandler methods
 bool ClientHandler::OnBeforePopup(CefRefPtr<CefBrowser> browser,
                              CefRefPtr<CefFrame> frame,
@@ -426,14 +455,12 @@ void ClientHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser)
 // CefLoadHandler methods
 void ClientHandler::OnLoadStart(CefRefPtr<CefBrowser> browser,
                                 CefRefPtr<CefFrame> frame)
-{
-}
+{}
 
 void ClientHandler::OnLoadEnd(CefRefPtr<CefBrowser> browser,
                               CefRefPtr<CefFrame> frame,
                               int httpStatusCode)
-{
-}
+{}
 
 void ClientHandler::OnLoadError(CefRefPtr<CefBrowser> browser,
                                 CefRefPtr<CefFrame> frame,
