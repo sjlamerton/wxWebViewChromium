@@ -201,8 +201,7 @@ wxString wxWebViewChromium::GetPageText() const
 
 wxString wxWebViewChromium::GetCurrentURL() const
 {
-  //  return m_browser->GetMainFrame()->GetURL().ToString();
-    return "";
+    return g_clientHandler->GetBrowser()->GetMainFrame()->GetURL().ToString();
 }
 
 wxString wxWebViewChromium::GetCurrentTitle() const
@@ -259,12 +258,14 @@ void wxWebViewChromium::ClearSelection()
 
 void wxWebViewChromium::RunScript(const wxString& javascript)
 {
-   // m_browser->GetMainFrame()->ExecuteJavaScript(javascript.ToStdString(), "", 0);
+    g_clientHandler->GetBrowser()->GetMainFrame()->ExecuteJavaScript(javascript.ToStdString(),
+                                                                     "", 0);
 }
 
 bool wxWebViewChromium::IsBusy() const
 {
-    return g_clientHandler->GetBrowser()->IsLoading();
+    if(g_clientHandler->GetBrowser())
+        return g_clientHandler->GetBrowser()->IsLoading();
 }
 
 void wxWebViewChromium::SetEditable(bool enable)
@@ -275,7 +276,8 @@ void wxWebViewChromium::SetEditable(bool enable)
 
 void wxWebViewChromium::DoSetPage(const wxString& html, const wxString& baseUrl)
 {
-  //  m_browser->GetMainFrame()->LoadString(html.ToStdString(), baseUrl.ToStdString());
+    g_clientHandler->GetBrowser()->GetMainFrame()->LoadString(html.ToStdString(),
+                                                              baseUrl.ToStdString());
 }
 
 wxWebViewZoom wxWebViewChromium::GetZoom() const
@@ -339,7 +341,7 @@ void wxWebViewChromium::SetZoom(wxWebViewZoom zoom)
         default:
             wxASSERT(false);
     }
-   // m_browser->GetHost()->SetZoomLevel(mapzoom);
+    g_clientHandler->GetBrowser()->GetHost()->SetZoomLevel(mapzoom);
 }
 
 void wxWebViewChromium::SetZoomType(wxWebViewZoomType type)
