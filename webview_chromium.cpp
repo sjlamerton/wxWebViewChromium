@@ -268,6 +268,8 @@ bool wxWebViewChromium::IsBusy() const
 {
     if(g_clientHandler->GetBrowser())
         return g_clientHandler->GetBrowser()->IsLoading();
+    else
+        return false;
 }
 
 void wxWebViewChromium::SetEditable(bool enable)
