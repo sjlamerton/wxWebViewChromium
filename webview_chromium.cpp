@@ -284,8 +284,10 @@ void wxWebViewChromium::DoSetPage(const wxString& html, const wxString& baseUrl)
 
 wxWebViewZoom wxWebViewChromium::GetZoom() const
 {
-    float zoom;
- //   float zoom = m_browser->GetHost()->GetZoomLevel();
+    float zoom = 0.0f;
+    //In cef this must be called on the UI thread so is more complex than this
+    //float zoom = g_clientHandler->GetBrowser()->GetHost()->GetZoomLevel();
+
     // arbitrary way to map float zoom to our common zoom enum
     if (zoom <= -0.75f)
     {
