@@ -73,7 +73,7 @@ wxWebViewChromium::~wxWebViewChromium()
     }
 }
 
-void wxWebViewChromium::OnSize(wxSizeEvent &WXUNUSED(event))
+void wxWebViewChromium::OnSize(wxSizeEvent& event)
 {
     wxSize size = GetClientSize();
     wxPoint pos = GetPosition();
@@ -86,6 +86,8 @@ void wxWebViewChromium::OnSize(wxSizeEvent &WXUNUSED(event))
                           size.GetWidth(), size.GetHeight(), SWP_NOZORDER);
     EndDeferWindowPos(hdwp);
 #endif
+
+    event.Skip();
 }
 
 bool wxWebViewChromium::CanGoForward() const
@@ -215,32 +217,32 @@ void wxWebViewChromium::Print()
 
 void wxWebViewChromium::Cut()
 {
-  //  m_browser->GetMainFrame()->Cut();
+    g_clientHandler->GetBrowser()->GetMainFrame()->Cut();
 }
 
 void wxWebViewChromium::Copy()
 {
- //   m_browser->GetMainFrame()->Copy();
+    g_clientHandler->GetBrowser()->GetMainFrame()->Copy();
 }
 
 void wxWebViewChromium::Paste()
 {
-//m_browser->GetMainFrame()->Paste();
+    g_clientHandler->GetBrowser()->GetMainFrame()->Paste();
 }
 
 void wxWebViewChromium::Undo()
 {
- //   m_browser->GetMainFrame()->Undo();
+    g_clientHandler->GetBrowser()->GetMainFrame()->Undo();
 }
 
 void wxWebViewChromium::Redo()
 {
-   // m_browser->GetMainFrame()->Redo();
+    g_clientHandler->GetBrowser()->GetMainFrame()->Redo();
 }
 
 void wxWebViewChromium::SelectAll()
 {
-   // m_browser->GetMainFrame()->SelectAll();
+   g_clientHandler->GetBrowser()->GetMainFrame()->SelectAll();
 }
 
 void wxWebViewChromium::DeleteSelection()
