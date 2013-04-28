@@ -264,7 +264,7 @@ void wxWebViewChromium::RunScript(const wxString& javascript)
 
 bool wxWebViewChromium::IsBusy() const
 {
-    return g_clientHandler->IsBusy();
+    return g_clientHandler->GetBrowser()->IsLoading();
 }
 
 void wxWebViewChromium::SetEditable(bool enable)
@@ -425,20 +425,12 @@ void ClientHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser)
 void ClientHandler::OnLoadStart(CefRefPtr<CefBrowser> browser,
                                 CefRefPtr<CefFrame> frame)
 {
-    if(browser->GetIdentifier() == m_browserId && frame->IsMain())
-    {
-        m_isLoading = true;
-    }
 }
 
 void ClientHandler::OnLoadEnd(CefRefPtr<CefBrowser> browser,
                               CefRefPtr<CefFrame> frame,
                               int httpStatusCode)
 {
-    if(browser->GetIdentifier() == m_browserId && frame->IsMain())
-    {
-        m_isLoading = false;
-    }
 }
 
 void ClientHandler::OnLoadError(CefRefPtr<CefBrowser> browser,

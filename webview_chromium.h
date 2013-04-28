@@ -35,7 +35,7 @@ class ClientHandler : public CefClient,
                       public CefLoadHandler
 {
 public:
-    ClientHandler() : m_isLoading(false) {};
+    ClientHandler() {};
     virtual ~ClientHandler() {};
 
     virtual CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() { return this; }
@@ -71,12 +71,9 @@ public:
 
     CefRefPtr<CefBrowser> GetBrowser() { return m_browser; }
 
-    bool IsBusy() { return m_isLoading; }
-
 private:
     CefRefPtr<CefBrowser> m_browser;
     int m_browserId;
-    bool m_isLoading;
 
     IMPLEMENT_REFCOUNTING(ClientHandler);
 };
