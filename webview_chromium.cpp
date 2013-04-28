@@ -455,12 +455,59 @@ void ClientHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser)
 // CefLoadHandler methods
 void ClientHandler::OnLoadStart(CefRefPtr<CefBrowser> browser,
                                 CefRefPtr<CefFrame> frame)
-{}
+{
+    wxString url = frame->GetURL().ToString();
+    wxString target = frame->GetName().ToString();
+
+    wxWebViewEvent event(wxEVT_COMMAND_WEBVIEW_NAVIGATING, m_webview->GetId(), url, target);
+    event.SetEventObject(m_webview);
+
+    m_webview->HandleWindowEvent(event);
+
+    if (!event.IsAllowed())
+    {
+        // We do not yet have support for vetoing pages
+    }
+}
 
 void ClientHandler::OnLoadEnd(CefRefPtr<CefBrowser> browser,
                               CefRefPtr<CefFrame> frame,
                               int httpStatusCode)
-{}
+{
+    wxString url = frame->GetURL().ToString();
+    wxString target = frame->GetName().ToString();
+
+    wxWebViewEvent event(wxEVT_COMMAND_WEBVIEW_NAVIGATED, m_webview->GetId(), url, target);
+    event.SetEventObject(m_webview);
+
+    m_webview->HandleWindowEvent(event);
+
+    if(frame->IsMain())
+    {
+        //As we are complete we also add to the history list, but not if the
+        //page is not the main page, ie it is a subframe
+        if(m_webview->m_historyEnabled && !m_webview->m_historyLoadingFromList)
+        {
+            //If we are not at the end of the list, then erase everything
+            //between us and the end before adding the new page
+            if(m_webview->m_historyPosition != static_cast<int>(m_webview->m_historyList.size()) - 1)
+            {
+                m_webview->m_historyList.erase(m_webview->m_historyList.begin() + m_webview->m_historyPosition + 1,
+                                               m_webview->m_historyList.end());
+            }
+            wxSharedPtr<wxWebViewHistoryItem> item(new wxWebViewHistoryItem(url, m_webview->GetCurrentTitle()));
+            m_webview->m_historyList.push_back(item);
+            m_webview->m_historyPosition++;
+        }
+        //Reset as we are done now
+        m_webview->m_historyLoadingFromList = false;
+
+        wxWebViewEvent levent(wxEVT_COMMAND_WEBVIEW_LOADED, m_webview->GetId(), url, target);
+        levent.SetEventObject(m_webview);
+
+        m_webview->HandleWindowEvent(levent);
+    }
+}
 
 void ClientHandler::OnLoadError(CefRefPtr<CefBrowser> browser,
                                 CefRefPtr<CefFrame> frame,
