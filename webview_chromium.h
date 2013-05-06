@@ -7,22 +7,6 @@
 #ifndef _WX_WEBVIEWCHROMIUM_H_
 #define _WX_WEBVIEWCHROMIUM_H_
 
-#ifdef __VISUALC__
-#pragma warning(push)
-#pragma warning(disable:4100)
-#endif
-
-#include <include/cef_version.h>
-
-#if CEF_REVISION < 607
-#include <include/cef.h>
-#else
-#include <include/cef_browser.h>
-#endif
-
-#ifdef __VISUALC__
-#pragma warning(pop)
-#endif
 
 #include <wx/control.h>
 #include <wx/webview.h>
@@ -31,7 +15,90 @@
 #include <wx/webview.h>
 #include <wx/timer.h>
 
+#ifdef __VISUALC__
+#pragma warning(push)
+#pragma warning(disable:4100)
+#endif
+
+#include <include/cef_browser.h>
+#include <include/cef_client.h>
+
+#ifdef __VISUALC__
+#pragma warning(pop)
+#endif
+
 extern const char wxWebViewBackendChromium[];
+
+class wxWebViewChromium;
+
+// ClientHandler implementation.
+class ClientHandler : public CefClient,
+                      public CefDisplayHandler,
+                      public CefLifeSpanHandler,
+                      public CefLoadHandler
+{
+public:
+    ClientHandler() {};
+    virtual ~ClientHandler() {};
+
+    virtual CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() { return this; }
+    virtual CefRefPtr<CefLoadHandler> GetLoadHandler() { return this; }
+    virtual CefRefPtr<CefDisplayHandler> GetDisplayHandler() { return this; }
+
+    // CefDisplayHandler methods
+    virtual void OnLoadingStateChange(CefRefPtr<CefBrowser> browser,
+                                      bool isLoading,  bool canGoBack,
+                                      bool canGoForward);
+    virtual void OnAddressChange(CefRefPtr<CefBrowser> browser,
+                                 CefRefPtr<CefFrame> frame,
+                                 const CefString& url);
+    virtual void OnTitleChange(CefRefPtr<CefBrowser> browser,
+                               const CefString& title);
+    virtual bool OnConsoleMessage(CefRefPtr<CefBrowser> browser,
+                                  const CefString& message,
+                                  const CefString& source,
+                                  int line);
+
+    // CefLifeSpanHandler methods
+    virtual bool OnBeforePopup(CefRefPtr<CefBrowser> browser,
+                               CefRefPtr<CefFrame> frame,
+                               const CefString& target_url,
+                               const CefString& target_frame_name,
+                               const CefPopupFeatures& popupFeatures,
+                               CefWindowInfo& windowInfo,
+                               CefRefPtr<CefClient>& client,
+                               CefBrowserSettings& settings,
+                               bool* no_javascript_access);
+    virtual void OnAfterCreated(CefRefPtr<CefBrowser> browser);
+    virtual bool DoClose(CefRefPtr<CefBrowser> browser);
+    virtual void OnBeforeClose(CefRefPtr<CefBrowser> browser);
+
+    // CefLoadHandler methods
+    virtual void OnLoadStart(CefRefPtr<CefBrowser> browser,
+                             CefRefPtr<CefFrame> frame);
+    virtual void OnLoadEnd(CefRefPtr<CefBrowser> browser,
+                           CefRefPtr<CefFrame> frame,
+                           int httpStatusCode);
+    virtual void OnLoadError(CefRefPtr<CefBrowser> browser,
+                             CefRefPtr<CefFrame> frame,
+                             ErrorCode errorCode,
+                             const CefString& errorText,
+                             const CefString& failedUrl);
+    virtual void OnRenderProcessTerminated(CefRefPtr<CefBrowser> browser,
+                                           TerminationStatus status);
+
+    CefRefPtr<CefBrowser> GetBrowser() { return m_browser; }
+
+    void SetWebView(wxWebViewChromium *webview) { m_webview = webview; }
+
+private:
+    CefRefPtr<CefBrowser> m_browser;
+    wxWebViewChromium *m_webview;
+    int m_browserId;
+
+    IMPLEMENT_REFCOUNTING(ClientHandler);
+};
+
 
 class WXDLLIMPEXP_WEBVIEW wxWebViewChromium : public wxWebView
 {
@@ -52,7 +119,6 @@ public:
 
     ~wxWebViewChromium();
 
-    void OnTimer(wxTimerEvent &event);
     void OnSize(wxSizeEvent &event);
 
     bool Create(wxWindow* parent,
@@ -93,7 +159,7 @@ public:
     virtual wxWebViewZoom GetZoom() const;
     virtual void SetZoom(wxWebViewZoom zoom);
 
-    virtual void* GetNativeBackend() const { return m_browser; }
+    virtual void* GetNativeBackend() const;
 
     virtual long Find(const wxString& text, int flags = wxWEBVIEW_FIND_DEFAULT) { return wxNOT_FOUND; }
 
@@ -128,14 +194,13 @@ public:
     //Virtual Filesystem Support
     virtual void RegisterHandler(wxSharedPtr<wxWebViewHandler> handler);
 
+    static bool StartUp();
     static void Shutdown();
 
 protected:
     virtual void DoSetPage(const wxString& html, const wxString& baseUrl);
 
 private:
-    CefRefPtr<CefBrowser> m_browser;
-
     //History related variables, we currently use our own implementation
     wxVector<wxSharedPtr<wxWebViewHistoryItem> > m_historyList;
     int m_historyPosition;
@@ -152,7 +217,6 @@ private:
     friend class ClientHandler;
   
     wxDECLARE_DYNAMIC_CLASS(wxWebViewChromium);
-    wxDECLARE_EVENT_TABLE();
 };
 
 class WXDLLIMPEXP_WEBVIEW wxWebViewFactoryChromium : public wxWebViewFactory

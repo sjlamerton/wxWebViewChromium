@@ -15,6 +15,10 @@ class SimpleFrame : public wxFrame
 {
 public:
     SimpleFrame();
+    void OnButton(wxCommandEvent &evt);
+
+private:
+    wxWebView *m_webview;
 };
 
 IMPLEMENT_APP(SimpleApp)
