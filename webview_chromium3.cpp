@@ -5,6 +5,11 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include "webview_chromium.h"
+
+#if CEF_API == 3
+
+#include "webview_chromium.h"
+
 #include <wx/webview.h>
 #include <wx/filesys.h>
 #include <wx/msw/private.h>
@@ -595,3 +600,5 @@ void ClientHandler::OnLoadError(CefRefPtr<CefBrowser> browser,
 void ClientHandler::OnRenderProcessTerminated(CefRefPtr<CefBrowser> browser,
                                               TerminationStatus status)
 {}
+
+#endif

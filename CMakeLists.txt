@@ -25,11 +25,15 @@ if(UNIX)
     include_directories(${GTK2_INCLUDE_DIRS})
 endif()
 
+# Set up the source and header files
+set(source webview_chromium1.cpp webview_chromium3.cpp)
+set(headers webview_chromium1.h webview_chromium3.h webview_chromium.h)
+
 # Find wxWidgets
-find_package(wxWidgets COMPONENTS webview adv  xml stc scintilla core base REQUIRED)
+find_package(wxWidgets COMPONENTS webview adv xml stc scintilla core base REQUIRED)
 include(${wxWidgets_USE_FILE})
 
 # Addwxwebviewchromium to a simple library so we can use it in all samples
-add_library(wvc STATIC webview_chromium.cpp webview_chromium.h)
+add_library(wvc STATIC ${source} ${headers})
 
 add_subdirectory(samples)
