@@ -92,6 +92,11 @@ void wxWebViewChromium::OnSize(wxSizeEvent& event)
     event.Skip();
 }
 
+void* wxWebViewChromium::GetNativeBackend() const
+{
+    return g_clientHandler->GetBrowser();
+}
+
 bool wxWebViewChromium::CanGoForward() const
 { 
     if(m_historyEnabled)

@@ -159,7 +159,7 @@ public:
     virtual wxWebViewZoom GetZoom() const;
     virtual void SetZoom(wxWebViewZoom zoom);
 
-    virtual void* GetNativeBackend() const { return NULL;/*m_clientHandler->GetBrowser();*/ }
+    virtual void* GetNativeBackend() const;
 
     virtual long Find(const wxString& text, int flags = wxWEBVIEW_FIND_DEFAULT) { return wxNOT_FOUND; }
 
