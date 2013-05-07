@@ -9,16 +9,17 @@ Requirements
 ------------
 
 * [wxWidgets][2]: r73369 / 2.9.5  or greater
-* [Chromium Embedded Framework][3]:  1.963.439, 1.1025.607, 1.1180.832 or 
-   1.1364.1123.
+* [Chromium Embedded Framework][3]:  1.963.439, 1.1025.607, 1.1180.832, 
+   1.1364.1123 or 3.1364.1188.
 
 Compiling
 ---------
 
-The backend is made up of only two files, `webview_chromium.cpp` and
-`webview_chromium.h`. Simply compile these alongside your project after
-adding the path to your Chromiumium Embedded Framework to your include
-directory list and linking to `libcef_dll_wrapper` and `libcef`.
+The backend is made up of five files, a source and header file for CEF1
+and CEF3 and a selection header. Simply compile these alongside your
+project and add the path to your Chromiumium Embedded Framework
+install to your include directory list and link to `libcef_dll_wrapper`
+and `libcef`.
 
 Using
 -----
