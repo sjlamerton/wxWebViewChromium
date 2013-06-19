@@ -86,12 +86,18 @@ void wxWebViewChromium::OnSize(wxSizeEvent& event)
     wxPoint pos = GetPosition();
 
 #ifdef __WXMSW__
-    HWND handle = g_clientHandler->GetBrowser()->GetHost()->GetWindowHandle();
-    HDWP hdwp = BeginDeferWindowPos(1);
-    hdwp = DeferWindowPos(hdwp, handle, 
-                          NULL, pos.x, pos.y,
-                          size.GetWidth(), size.GetHeight(), SWP_NOZORDER);
-    EndDeferWindowPos(hdwp);
+    if(g_clientHandler && g_clientHandler->GetBrowser() && g_clientHandler->GetBrowser()->GetHost())
+    {
+        HWND handle = g_clientHandler->GetBrowser()->GetHost()->GetWindowHandle();
+
+        if(handle)
+        {
+            HDWP hdwp = BeginDeferWindowPos(1);
+            hdwp = DeferWindowPos(hdwp, handle, NULL, pos.x, pos.y,
+                                  size.GetWidth(), size.GetHeight(), SWP_NOZORDER);
+            EndDeferWindowPos(hdwp);
+        }
+    }
 #endif
 
     event.Skip();
