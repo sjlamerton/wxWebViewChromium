@@ -195,7 +195,7 @@ public:
     //Virtual Filesystem Support
     virtual void RegisterHandler(wxSharedPtr<wxWebViewHandler> handler);
 
-    static bool StartUp();
+    static bool StartUp(int &code);
     static void Shutdown();
 
 protected:

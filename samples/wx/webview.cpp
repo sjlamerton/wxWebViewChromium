@@ -218,8 +218,9 @@ IMPLEMENT_APP(WebApp)
 
 bool WebApp::OnInit()
 {
-    if( !wxWebViewChromium::StartUp() )
-        return false;
+    int code = 0;
+    if(!wxWebViewChromium::StartUp(code))
+        exit(code);
 
     if ( !wxApp::OnInit() )
         return false;

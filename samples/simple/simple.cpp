@@ -16,8 +16,9 @@
 
 bool SimpleApp::OnInit()
 {
-    if(!wxWebViewChromium::StartUp())
-        return false;
+    int code = 0;
+    if(!wxWebViewChromium::StartUp(code))
+        exit(code);
 
     SimpleFrame *frame = new SimpleFrame();
     frame->Show(true);

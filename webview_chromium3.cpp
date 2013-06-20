@@ -388,13 +388,15 @@ void wxWebViewChromium::RegisterHandler(wxSharedPtr<wxWebViewHandler> handler)
     // We currently don't support custom scheme handlers
 }
 
-bool wxWebViewChromium::StartUp()
+bool wxWebViewChromium::StartUp(int &code)
 {
     if(!g_clientHandler)
         g_clientHandler = new ClientHandler;
 
     CefMainArgs args(wxGetInstance()); 
-    if(CefExecuteProcess(args, NULL) >= 0)
+
+    code = CefExecuteProcess(args, NULL);
+    if(code >= 0)
         return false;
 
     CefSettings settings;
