@@ -388,23 +388,35 @@ void wxWebViewChromium::RegisterHandler(wxSharedPtr<wxWebViewHandler> handler)
     // We currently don't support custom scheme handlers
 }
 
-bool wxWebViewChromium::StartUp(int &code)
+bool wxWebViewChromium::StartUp(int &code, const wxString &path)
 {
     if(!g_clientHandler)
         g_clientHandler = new ClientHandler;
 
     CefMainArgs args(wxGetInstance()); 
 
-    code = CefExecuteProcess(args, NULL);
-    if(code >= 0)
-        return false;
+    // If there is no subprocess then we need to execute on this process
+    if(path == "")
+    {
+        code = CefExecuteProcess(args, NULL);
+        if(code >= 0)
+            return false;
+    }
 
     CefSettings settings;
     // We use a multithreaded message loop so we don't have to integrate
     // with the wx message loop
     settings.multi_threaded_message_loop = true;
+    CefString(&settings.browser_subprocess_path) = path.ToStdString();
 
     return CefInitialize(args, settings, NULL);
+}
+
+int wxWebViewChromium::StartUpSubprocess()
+{
+    CefMainArgs args(wxGetInstance()); 
+
+    return CefExecuteProcess(args, NULL);
 }
 
 void wxWebViewChromium::Shutdown()

@@ -195,7 +195,9 @@ public:
     //Virtual Filesystem Support
     virtual void RegisterHandler(wxSharedPtr<wxWebViewHandler> handler);
 
-    static bool StartUp(int &code);
+    static bool StartUp(int &code, const wxString &path = "");
+    // If using a separate subprocess then return the result of this function
+    static int StartUpSubprocess();
     static void Shutdown();
 
 protected:

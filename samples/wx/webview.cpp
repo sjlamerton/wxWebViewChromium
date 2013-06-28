@@ -218,8 +218,9 @@ IMPLEMENT_APP(WebApp)
 
 bool WebApp::OnInit()
 {
+    // We spawn a separate subprocess
     int code = 0;
-    if(!wxWebViewChromium::StartUp(code))
+    if(!wxWebViewChromium::StartUp(code, "subprocess.exe"))
         exit(code);
 
     if ( !wxApp::OnInit() )
