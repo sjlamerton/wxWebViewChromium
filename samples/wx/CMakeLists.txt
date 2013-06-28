@@ -20,3 +20,4 @@ target_link_libraries(subprocess wvc ${wxWidgets_LIBRARIES}
                                      debug ${CEF_WRAPPER_LIBRARY_DEBUG}
                                      optimized ${CEF_WRAPPER_LIBRARY_RELEASE})
 
+add_dependencies(webview subprocess)
