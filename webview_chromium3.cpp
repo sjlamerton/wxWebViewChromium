@@ -460,7 +460,15 @@ bool ClientHandler::OnBeforePopup(CefRefPtr<CefBrowser> browser,
                              CefBrowserSettings& settings,
                              bool* no_javascript_access)
 {
-    return false;
+    wxWebViewEvent *event = new wxWebViewEvent(wxEVT_WEBVIEW_NEWWINDOW,
+                                               m_webview->GetId(),
+                                               target_url.ToString(),
+                                               target_frame_name.ToString());
+    event->SetEventObject(m_webview);
+    // We use queue event as this function is called on the render thread
+    m_webview->GetEventHandler()->QueueEvent(event);
+
+    return true;
 }
 
 void ClientHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
