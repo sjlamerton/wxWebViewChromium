@@ -34,6 +34,7 @@ class wxWebViewChromium;
 
 // ClientHandler implementation.
 class ClientHandler : public CefClient,
+                      public CefContextMenuHandler,
                       public CefDisplayHandler,
                       public CefLifeSpanHandler,
                       public CefLoadHandler
@@ -42,6 +43,7 @@ public:
     ClientHandler() {};
     virtual ~ClientHandler() {};
 
+    virtual CefRefPtr<CefContextMenuHandler> GetContextMenuHandler() { return this; }
     virtual CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() { return this; }
     virtual CefRefPtr<CefLoadHandler> GetLoadHandler() { return this; }
     virtual CefRefPtr<CefDisplayHandler> GetDisplayHandler() { return this; }
@@ -59,6 +61,19 @@ public:
                                   const CefString& message,
                                   const CefString& source,
                                   int line);
+
+    // CefContextMenuHandler methods
+    virtual void OnBeforeContextMenu(CefRefPtr<CefBrowser> browser,
+                                     CefRefPtr<CefFrame> frame,
+                                     CefRefPtr<CefContextMenuParams> params,
+                                     CefRefPtr<CefMenuModel> model);
+    virtual bool OnContextMenuCommand(CefRefPtr<CefBrowser> browser,
+                                      CefRefPtr<CefFrame> frame,
+                                      CefRefPtr<CefContextMenuParams> params,
+                                      int command_id,
+                                      CefContextMenuHandler::EventFlags event_flags);
+    virtual void OnContextMenuDismissed(CefRefPtr<CefBrowser> browser,
+                                        CefRefPtr<CefFrame> frame);
 
     // CefLifeSpanHandler methods
     virtual bool OnBeforePopup(CefRefPtr<CefBrowser> browser,

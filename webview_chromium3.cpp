@@ -426,6 +426,29 @@ bool ClientHandler::OnConsoleMessage(CefRefPtr<CefBrowser> browser, const CefStr
     return false;
 }
 
+    // CefContextMenuHandler methods
+void ClientHandler::OnBeforeContextMenu(CefRefPtr<CefBrowser> browser,
+                                        CefRefPtr<CefFrame> frame,
+                                        CefRefPtr<CefContextMenuParams> params,
+                                        CefRefPtr<CefMenuModel> model)
+{
+    if(!m_webview->IsContextMenuEnabled())
+        model->Clear();
+}
+
+bool ClientHandler::OnContextMenuCommand(CefRefPtr<CefBrowser> browser,
+                                         CefRefPtr<CefFrame> frame,
+                                         CefRefPtr<CefContextMenuParams> params,
+                                         int command_id,
+                                         CefContextMenuHandler::EventFlags event_flags)
+{
+    return false;
+}
+
+void ClientHandler::OnContextMenuDismissed(CefRefPtr<CefBrowser> browser,
+                                           CefRefPtr<CefFrame> frame)
+{}
+
 // CefLifeSpanHandler methods
 bool ClientHandler::OnBeforePopup(CefRefPtr<CefBrowser> browser,
                              CefRefPtr<CefFrame> frame,
