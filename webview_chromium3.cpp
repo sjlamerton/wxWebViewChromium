@@ -51,6 +51,7 @@ bool wxWebViewChromium::Create(wxWindow* parent,
     m_historyLoadingFromList = false;
     m_historyEnabled = true;
     m_historyPosition = -1;
+    m_zoomLevel = wxWEBVIEW_ZOOM_MEDIUM;
 
     CefBrowserSettings browsersettings;
     CefWindowInfo info;
@@ -302,40 +303,14 @@ void wxWebViewChromium::DoSetPage(const wxString& html, const wxString& baseUrl)
 
 wxWebViewZoom wxWebViewChromium::GetZoom() const
 {
-    float zoom = 0.0f;
-    //In cef this must be called on the UI thread so is more complex than this
-    //float zoom = g_clientHandler->GetBrowser()->GetHost()->GetZoomLevel();
-
-    // arbitrary way to map float zoom to our common zoom enum
-    if (zoom <= -0.75f)
-    {
-        return wxWEBVIEW_ZOOM_TINY;
-    }
-    else if (zoom > -0.75 && zoom <= -0.25)
-    {
-        return wxWEBVIEW_ZOOM_SMALL;
-    }
-    else if (zoom > -0.25 && zoom <= 0.25)
-    {
-        return wxWEBVIEW_ZOOM_MEDIUM;
-    }
-    else if (zoom > 0.25 && zoom <= 0.75)
-    {
-        return wxWEBVIEW_ZOOM_LARGE;
-    }
-    else if (zoom > 0.75)
-    {
-        return wxWEBVIEW_ZOOM_LARGEST;
-    }
-
-    // to shut up compilers, this can never be reached logically
-    wxASSERT(false);
-    return wxWEBVIEW_ZOOM_MEDIUM;
+     return m_zoomLevel;
 }
 
 
 void wxWebViewChromium::SetZoom(wxWebViewZoom zoom)
 {
+    m_zoomLevel = zoom;
+
     double mapzoom;
     // arbitrary way to map our common zoom enum to float zoom
     switch (zoom)

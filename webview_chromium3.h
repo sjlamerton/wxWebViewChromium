@@ -210,8 +210,9 @@ private:
     bool m_historyLoadingFromList;
     bool m_historyEnabled;
 
-    //We need to store the title ourselves
+    //We need to store the title and zoom ourselves
     wxString m_title;
+    wxWebViewZoom m_zoomLevel;
 
     //The timer calls the CEF event loop
     wxTimer *m_timer;
