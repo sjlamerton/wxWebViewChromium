@@ -14,19 +14,19 @@ find_path(CEF_INCLUDE_DIR "include/cef_version.h"
 
 # Find the dll_wrapper
 find_library(CEF_WRAPPER_LIBRARY_RELEASE NAMES libcef_dll_wrapper
-             HINTS "${CEF_ROOT_DIR}/lib"
-             PATH_SUFFIXES "Release")
+             HINTS "${CEF_ROOT_DIR}" "${CEF_ROOT_DIR}/lib" "${CEF_ROOT_DIR}/out"
+             PATH_SUFFIXES "Release" "Release/lib")
 find_library(CEF_WRAPPER_LIBRARY_DEBUG NAMES libcef_dll_wrapper
-             HINTS "${CEF_ROOT_DIR}/lib"
-             PATH_SUFFIXES "Debug")
+             HINTS "${CEF_ROOT_DIR}" "${CEF_ROOT_DIR}/lib" "${CEF_ROOT_DIR}/out"
+             PATH_SUFFIXES "Debug" "Debug/lib")
 select_library_configurations(CEF_WRAPPER)
 
 # Find the library itself
 find_library(CEF_LIBRARY_RELEASE NAMES libcef
-             HINTS "${CEF_ROOT_DIR}/lib"
+             HINTS "${CEF_ROOT_DIR}" "${CEF_ROOT_DIR}/lib"
              PATH_SUFFIXES "Release")
 find_library(CEF_LIBRARY_DEBUG NAMES libcef
-             HINTS "${CEF_ROOT_DIR}/lib"
+             HINTS "${CEF_ROOT_DIR}" "${CEF_ROOT_DIR}/lib"
              PATH_SUFFIXES "Debug")
 select_library_configurations(CEF)
 
