@@ -234,6 +234,7 @@ private:
 
     //We also friend ClientHandler so it can access the history
     friend class ClientHandler;
+    CefRefPtr<ClientHandler> m_clientHandler;
   
     wxDECLARE_DYNAMIC_CLASS(wxWebViewChromium);
 };
