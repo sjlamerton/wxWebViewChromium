@@ -31,9 +31,7 @@
 extern const char wxWebViewBackendChromium[] = "wxWebViewChromium";
 
 wxIMPLEMENT_DYNAMIC_CLASS(wxWebViewChromium, wxWebView);
-
-CefRefPtr<ClientHandler> g_clientHandler;
-
+ 
 bool wxWebViewChromium::Create(wxWindow* parent,
            wxWindowID id,
            const wxString& url,
@@ -55,8 +53,9 @@ bool wxWebViewChromium::Create(wxWindow* parent,
 
     CefBrowserSettings browsersettings;
     CefWindowInfo info;
-
-    g_clientHandler->SetWebView(this);
+    
+    m_clientHandler = new ClientHandler();
+    m_clientHandler->SetWebView(this);
 
 #ifdef __WXMSW__
     // Initialize window info to the defaults for a child window
@@ -64,7 +63,7 @@ bool wxWebViewChromium::Create(wxWindow* parent,
 #endif
     // Creat the new child browser window, we do this async as we use a multi
     // threaded message loop
-    CefBrowserHost::CreateBrowser(info, static_cast<CefRefPtr<CefClient>>(g_clientHandler),
+    CefBrowserHost::CreateBrowser(info, static_cast<CefRefPtr<CefClient>>(m_clientHandler),
                                   url.ToStdString(), browsersettings);
 
     this->Bind(wxEVT_SIZE, &wxWebViewChromium::OnSize, this);
@@ -74,7 +73,7 @@ bool wxWebViewChromium::Create(wxWindow* parent,
 
 wxWebViewChromium::~wxWebViewChromium()
 {
-    CefRefPtr<CefBrowser> browser = g_clientHandler->GetBrowser();
+    CefRefPtr<CefBrowser> browser = m_clientHandler->GetBrowser();
     if(browser.get()) {
         // Let the browser window know we are about to destroy it.
         browser->GetHost()->ParentWindowWillClose();
@@ -84,17 +83,16 @@ wxWebViewChromium::~wxWebViewChromium()
 void wxWebViewChromium::OnSize(wxSizeEvent& event)
 {
     wxSize size = GetClientSize();
-    wxPoint pos = GetPosition();
 
 #ifdef __WXMSW__
-    if(g_clientHandler && g_clientHandler->GetBrowser() && g_clientHandler->GetBrowser()->GetHost())
+    if(m_clientHandler && m_clientHandler->GetBrowser() && m_clientHandler->GetBrowser()->GetHost())
     {
-        HWND handle = g_clientHandler->GetBrowser()->GetHost()->GetWindowHandle();
+        HWND handle = m_clientHandler->GetBrowser()->GetHost()->GetWindowHandle();
 
         if(handle)
         {
             HDWP hdwp = BeginDeferWindowPos(1);
-            hdwp = DeferWindowPos(hdwp, handle, NULL, pos.x, pos.y,
+            hdwp = DeferWindowPos(hdwp, handle, NULL, 0, 0,
                                   size.GetWidth(), size.GetHeight(), SWP_NOZORDER);
             EndDeferWindowPos(hdwp);
         }
@@ -106,7 +104,7 @@ void wxWebViewChromium::OnSize(wxSizeEvent& event)
 
 void* wxWebViewChromium::GetNativeBackend() const
 {
-    return g_clientHandler->GetBrowser();
+    return m_clientHandler->GetBrowser();
 }
 
 bool wxWebViewChromium::CanGoForward() const
@@ -177,7 +175,7 @@ void wxWebViewChromium::GoForward()
 
 void wxWebViewChromium::LoadURL(const wxString& url)
 { 
-    g_clientHandler->GetBrowser()->GetMainFrame()->LoadURL(url.ToStdString());
+    m_clientHandler->GetBrowser()->GetMainFrame()->LoadURL(url.ToStdString());
 }
 
 void wxWebViewChromium::ClearHistory()
@@ -193,18 +191,18 @@ void wxWebViewChromium::EnableHistory(bool enable)
 
 void wxWebViewChromium::Stop()
 {
-    g_clientHandler->GetBrowser()->StopLoad();
+    m_clientHandler->GetBrowser()->StopLoad();
 }
 
 void wxWebViewChromium::Reload(wxWebViewReloadFlags flags)
 {
     if(flags == wxWEBVIEW_RELOAD_NO_CACHE)
     {
-        g_clientHandler->GetBrowser()->ReloadIgnoreCache();
+        m_clientHandler->GetBrowser()->ReloadIgnoreCache();
     }
     else
     {
-        g_clientHandler->GetBrowser()->Reload();
+        m_clientHandler->GetBrowser()->Reload();
     }
 }
 
@@ -220,7 +218,7 @@ wxString wxWebViewChromium::GetPageText() const
 
 wxString wxWebViewChromium::GetCurrentURL() const
 {
-    return g_clientHandler->GetBrowser()->GetMainFrame()->GetURL().ToString();
+    return m_clientHandler->GetBrowser()->GetMainFrame()->GetURL().ToString();
 }
 
 wxString wxWebViewChromium::GetCurrentTitle() const
@@ -235,32 +233,32 @@ void wxWebViewChromium::Print()
 
 void wxWebViewChromium::Cut()
 {
-    g_clientHandler->GetBrowser()->GetMainFrame()->Cut();
+    m_clientHandler->GetBrowser()->GetMainFrame()->Cut();
 }
 
 void wxWebViewChromium::Copy()
 {
-    g_clientHandler->GetBrowser()->GetMainFrame()->Copy();
+    m_clientHandler->GetBrowser()->GetMainFrame()->Copy();
 }
 
 void wxWebViewChromium::Paste()
 {
-    g_clientHandler->GetBrowser()->GetMainFrame()->Paste();
+    m_clientHandler->GetBrowser()->GetMainFrame()->Paste();
 }
 
 void wxWebViewChromium::Undo()
 {
-    g_clientHandler->GetBrowser()->GetMainFrame()->Undo();
+    m_clientHandler->GetBrowser()->GetMainFrame()->Undo();
 }
 
 void wxWebViewChromium::Redo()
 {
-    g_clientHandler->GetBrowser()->GetMainFrame()->Redo();
+    m_clientHandler->GetBrowser()->GetMainFrame()->Redo();
 }
 
 void wxWebViewChromium::SelectAll()
 {
-   g_clientHandler->GetBrowser()->GetMainFrame()->SelectAll();
+   m_clientHandler->GetBrowser()->GetMainFrame()->SelectAll();
 }
 
 void wxWebViewChromium::DeleteSelection()
@@ -277,14 +275,14 @@ void wxWebViewChromium::ClearSelection()
 
 void wxWebViewChromium::RunScript(const wxString& javascript)
 {
-    g_clientHandler->GetBrowser()->GetMainFrame()->ExecuteJavaScript(javascript.ToStdString(),
+    m_clientHandler->GetBrowser()->GetMainFrame()->ExecuteJavaScript(javascript.ToStdString(),
                                                                      "", 0);
 }
 
 bool wxWebViewChromium::IsBusy() const
 {
-    if(g_clientHandler->GetBrowser())
-        return g_clientHandler->GetBrowser()->IsLoading();
+    if(m_clientHandler->GetBrowser())
+        return m_clientHandler->GetBrowser()->IsLoading();
     else
         return false;
 }
@@ -297,7 +295,7 @@ void wxWebViewChromium::SetEditable(bool enable)
 
 void wxWebViewChromium::DoSetPage(const wxString& html, const wxString& baseUrl)
 {
-    g_clientHandler->GetBrowser()->GetMainFrame()->LoadString(html.ToStdString(),
+    m_clientHandler->GetBrowser()->GetMainFrame()->LoadString(html.ToStdString(),
                                                               baseUrl.ToStdString());
 }
 
@@ -338,7 +336,7 @@ void wxWebViewChromium::SetZoom(wxWebViewZoom zoom)
         default:
             wxASSERT(false);
     }
-    g_clientHandler->GetBrowser()->GetHost()->SetZoomLevel(mapzoom);
+    m_clientHandler->GetBrowser()->GetHost()->SetZoomLevel(mapzoom);
 }
 
 void wxWebViewChromium::SetZoomType(wxWebViewZoomType type)
@@ -365,9 +363,6 @@ void wxWebViewChromium::RegisterHandler(wxSharedPtr<wxWebViewHandler> handler)
 
 bool wxWebViewChromium::StartUp(int &code, const wxString &path)
 {
-    if(!g_clientHandler)
-        g_clientHandler = new ClientHandler;
-
     CefMainArgs args(wxGetInstance()); 
 
     // If there is no subprocess then we need to execute on this process
