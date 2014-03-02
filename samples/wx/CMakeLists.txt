@@ -21,3 +21,12 @@ target_link_libraries(subprocess wvc ${wxWidgets_LIBRARIES}
                                      optimized ${CEF_WRAPPER_LIBRARY_RELEASE})
 
 add_dependencies(webview subprocess)
+
+# Copy CEF's resources files to exe dir.
+add_custom_command(TARGET webview POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    "${CEF_ROOT_DIR}/$<CONFIGURATION>" $<TARGET_FILE_DIR:webview>)
+
+add_custom_command(TARGET webview POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    "${CEF_ROOT_DIR}/Resources" $<TARGET_FILE_DIR:webview>)
