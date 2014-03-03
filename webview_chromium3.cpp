@@ -405,11 +405,11 @@ void ClientHandler::OnAddressChange(CefRefPtr<CefBrowser> browser, CefRefPtr<Cef
 
 void ClientHandler::OnTitleChange(CefRefPtr<CefBrowser> browser, const CefString& title)
 {
-    m_webview->m_title = title.ToString();
+    m_webview->m_title = title.ToWString();
     wxString target = browser->GetMainFrame()->GetName().ToString();
 
     wxWebViewEvent event(wxEVT_COMMAND_WEBVIEW_TITLE_CHANGED, m_webview->GetId(), "", target);
-    event.SetString(title.ToString());
+    event.SetString(title.ToWString());
     event.SetEventObject(m_webview);
 
     m_webview->HandleWindowEvent(event);
