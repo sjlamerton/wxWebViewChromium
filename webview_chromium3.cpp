@@ -23,6 +23,7 @@
 
 #include <include/cef_app.h>
 #include <include/cef_browser.h>
+#include <include/cef_string_visitor.h>
 
 #ifdef __VISUALC__
 #pragma warning(pop)
@@ -31,7 +32,20 @@
 extern const char wxWebViewBackendChromium[] = "wxWebViewChromium";
 
 wxIMPLEMENT_DYNAMIC_CLASS(wxWebViewChromium, wxWebView);
- 
+
+class wxStringVisitor : public CefStringVisitor
+{
+public:
+    explicit wxStringVisitor(wxWebViewChromium* webview) : m_webview(webview) {}
+    void Visit(const CefString& string)
+    {
+        m_webview->SetPageSource(string.ToWString());
+    }
+private:
+    wxWebViewChromium *m_webview;
+    IMPLEMENT_REFCOUNTING(wxStringVisitor);
+};
+
 bool wxWebViewChromium::Create(wxWindow* parent,
            wxWindowID id,
            const wxString& url,
@@ -100,6 +114,11 @@ void wxWebViewChromium::OnSize(wxSizeEvent& event)
 #endif
 
     event.Skip();
+}
+
+void wxWebViewChromium::SetPageSource(const wxString& pageSource)
+{
+    m_pageSource = pageSource;
 }
 
 void* wxWebViewChromium::GetNativeBackend() const
@@ -208,7 +227,7 @@ void wxWebViewChromium::Reload(wxWebViewReloadFlags flags)
 
 wxString wxWebViewChromium::GetPageSource() const
 {
-    return "";
+    return m_pageSource;
 }
 
 wxString wxWebViewChromium::GetPageText() const 
@@ -519,6 +538,10 @@ void ClientHandler::OnLoadEnd(CefRefPtr<CefBrowser> browser,
 
     if(frame->IsMain())
     {
+        //Get source code when main frame loads ended.
+        CefRefPtr<CefStringVisitor> source_visitor = new wxStringVisitor(m_webview);
+        frame->GetSource(source_visitor);
+
         //As we are complete we also add to the history list, but not if the
         //page is not the main page, ie it is a subframe
         if(m_webview->m_historyEnabled && !m_webview->m_historyLoadingFromList)
