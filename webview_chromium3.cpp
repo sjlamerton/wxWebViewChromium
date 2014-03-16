@@ -36,12 +36,25 @@ wxIMPLEMENT_DYNAMIC_CLASS(wxWebViewChromium, wxWebView);
 class wxStringVisitor : public CefStringVisitor
 {
 public:
-    explicit wxStringVisitor(wxWebViewChromium* webview) : m_webview(webview) {}
+    enum StringType {
+      PAGE_SOURCE,
+      PAGE_TEXT,
+    };
+    wxStringVisitor(wxWebViewChromium* webview, StringType type) : m_webview(webview), m_type(type) {}
     void Visit(const CefString& string)
     {
-        m_webview->SetPageSource(string.ToWString());
+        switch(m_type)
+        {
+            case PAGE_SOURCE:
+                 m_webview->SetPageSource(string.ToWString());
+                 break;
+            case PAGE_TEXT:
+                 m_webview->SetPageText(string.ToWString());
+                 break;
+        }
     }
 private:
+    StringType m_type;
     wxWebViewChromium *m_webview;
     IMPLEMENT_REFCOUNTING(wxStringVisitor);
 };
@@ -119,6 +132,11 @@ void wxWebViewChromium::OnSize(wxSizeEvent& event)
 void wxWebViewChromium::SetPageSource(const wxString& pageSource)
 {
     m_pageSource = pageSource;
+}
+
+void wxWebViewChromium::SetPageText(const wxString& pageText)
+{
+    m_pageText = pageText;
 }
 
 void* wxWebViewChromium::GetNativeBackend() const
@@ -232,7 +250,7 @@ wxString wxWebViewChromium::GetPageSource() const
 
 wxString wxWebViewChromium::GetPageText() const 
 {
-    return  "";
+    return m_pageText;
 }
 
 wxString wxWebViewChromium::GetCurrentURL() const
@@ -539,8 +557,14 @@ void ClientHandler::OnLoadEnd(CefRefPtr<CefBrowser> browser,
     if(frame->IsMain())
     {
         //Get source code when main frame loads ended.
-        CefRefPtr<CefStringVisitor> source_visitor = new wxStringVisitor(m_webview);
+        CefRefPtr<CefStringVisitor> source_visitor = new wxStringVisitor(
+            m_webview, wxStringVisitor::PAGE_SOURCE);
         frame->GetSource(source_visitor);
+
+        //Get page text when main frame loads ended.
+        CefRefPtr<CefStringVisitor> text_visitor = new wxStringVisitor(
+            m_webview, wxStringVisitor::PAGE_TEXT);
+        frame->GetText(text_visitor);
 
         //As we are complete we also add to the history list, but not if the
         //page is not the main page, ie it is a subframe
