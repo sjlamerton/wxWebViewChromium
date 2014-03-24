@@ -843,8 +843,15 @@ void WebFrame::OnViewSourceRequest(wxCommandEvent& WXUNUSED(evt))
   */
 void WebFrame::OnViewTextRequest(wxCommandEvent& WXUNUSED(evt))
 {
-    SourceViewDialog dlg(this, m_browser->GetPageText());
-    dlg.ShowModal();
+    wxDialog textViewDialog(this, wxID_ANY, "Page Text",
+                            wxDefaultPosition, wxSize(700,500),
+                            wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER);
+    wxStyledTextCtrl* text = new wxStyledTextCtrl(&textViewDialog, wxID_ANY);
+    text->SetText(m_browser->GetPageText());
+    wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+    sizer->Add(text, 1, wxEXPAND);
+    SetSizer(sizer);
+    textViewDialog.ShowModal();
 }
 
 /**
