@@ -139,6 +139,8 @@ public:
 
     void SetPageSource(const wxString& pageSource);
 
+    void SetPageText(const wxString& pageText);
+
     bool Create(wxWindow* parent,
            wxWindowID id,
            const wxString& url = wxWebViewDefaultURLStr,
@@ -236,6 +238,9 @@ private:
 
     // Current main frame page source
     wxString m_pageSource;
+
+    // The text of the current page
+    wxString m_pageText;
 
     //We also friend ClientHandler so it can access the history
     friend class ClientHandler;
