@@ -90,9 +90,14 @@ bool wxWebViewChromium::Create(wxWindow* parent,
 #endif
     // Creat the new child browser window, we do this async as we use a multi
     // threaded message loop
+
+#if CHROME_VERSION_BUILD >= 1650
+    CefBrowserHost::CreateBrowser(info, static_cast<CefRefPtr<CefClient>>(m_clientHandler),
+                                  url.ToStdString(), browsersettings, NULL);
+#else
     CefBrowserHost::CreateBrowser(info, static_cast<CefRefPtr<CefClient>>(m_clientHandler),
                                   url.ToStdString(), browsersettings);
-
+#endif
     this->Bind(wxEVT_SIZE, &wxWebViewChromium::OnSize, this);
 
     return true;
@@ -664,9 +669,5 @@ void ClientHandler::OnLoadError(CefRefPtr<CefBrowser> browser,
 
     m_webview->HandleWindowEvent(event);
 }
-
-void ClientHandler::OnRenderProcessTerminated(CefRefPtr<CefBrowser> browser,
-                                              TerminationStatus status)
-{}
 
 #endif

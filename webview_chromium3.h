@@ -100,8 +100,6 @@ public:
                              ErrorCode errorCode,
                              const CefString& errorText,
                              const CefString& failedUrl);
-    virtual void OnRenderProcessTerminated(CefRefPtr<CefBrowser> browser,
-                                           TerminationStatus status);
 
     CefRefPtr<CefBrowser> GetBrowser() { return m_browser; }
 
